@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    html {
+      font-size: 18px;
+    }
     :root {
       --bg1: #1a2a6c;
       --bg2: #fdbb2d;
@@ -90,19 +93,41 @@
       flex-wrap: wrap;
     }
 
-    .pill {
-      border-radius: 999px;
-      padding: 5px 9px;
-      border: none;
-      font-size: 0.75rem;
-      background: rgba(0,0,0,.04);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all .15s ease;
-    }
+.pill {
+  border-radius: 999px;
+  padding: 8px 14px;      /* 少し大きめ */
+  min-height: 38px;       /* 指で押しやすい高さ */
+  border: none;
+  font-size: 0.8rem;
+  background: rgba(0,0,0,.04);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .15s ease;
+}
 
+.btn {
+  border-radius: 999px;
+  border: none;
+  padding: 10px 18px;     /* 余白を増やす */
+  min-height: 44px;       /* スマホ推奨サイズ */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.18);
+  white-space: nowrap;
+}
+
+.btn-small {
+  padding: 7px 12px;
+  min-height: 36px;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
     .pill span.icon {
       font-size: 0.85rem;
     }
@@ -221,20 +246,6 @@
       margin-top: 8px;
     }
 
-    .btn {
-      border-radius: 999px;
-      border: none;
-      padding: 8px 14px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.18);
-      white-space: nowrap;
-    }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), #ff9c33);
       color: white;
@@ -245,12 +256,6 @@
       color: #444;
       box-shadow: none;
       border: 1px solid rgba(0,0,0,.08);
-    }
-
-    .btn-small {
-      padding: 5px 9px;
-      font-size: 0.75rem;
-      box-shadow: none;
     }
 
     .hint {
@@ -863,10 +868,17 @@ pills.forEach(p => {
       if (playerFromMenu) {
         currentPlayerName = playerFromMenu;
         scorePlayerInput.value = playerFromMenu;
-        // 結果発表側は renderResultMain 内で currentPlayerName から反映します
       }
     }
 
+    showView(targetView);
+  });
+});
+
+// ★追加：pill 以外の「← Topへ戻る」などにも showView をつなぐ
+document.querySelectorAll('button[data-view]:not(.pill)').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetView = btn.dataset.view;
     showView(targetView);
   });
 });
