@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>小山YEGピンポンパン</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg1: #1a2a6c;
+      --bg2: #fdbb2d;
+      --bg3: #ff5f6d;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --accent: #ff7a00;
+      --accent2: #28b487;
+      --danger: #ff3366;
+      --neutral: #999;
+      --text-main: #222;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background: radial-gradient(circle at top left, var(--bg3), var(--bg2), var(--bg1));
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.88));
+      border-radius: 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+      padding: 16px 14px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-main {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      background: linear-gradient(90deg, var(--bg1), var(--bg3));
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 8px rgba(0,0,0,.1);
+    }
+
+    .title-sub {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(0,0,0,.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .nav-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 5px 9px;
+      border: none;
+      font-size: 0.75rem;
+      background: rgba(0,0,0,.04);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all .15s ease;
+    }
+
+    .pill span.icon {
+      font-size: 0.85rem;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+
+    main {
+      margin-top: 4px;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn .2s ease-out;
+    }
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(4px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top right, rgba(255,122,0,.10), transparent 60%);
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title-tag {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.06);
+      color: #555;
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .field-group {
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.18);
+      font-size: 0.85rem;
+      outline: none;
+      background: rgba(255,255,255,0.95);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(255,122,0,.45);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.18);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ff9c33);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: rgba(0,0,0,.04);
+      color: #444;
+      box-shadow: none;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .btn-small {
+      padding: 5px 9px;
+      font-size: 0.75rem;
+      box-shadow: none;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: #777;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.7rem;
+      background: rgba(0,0,0,.06);
+      color: #555;
+      gap: 4px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: #444;
+    }
+
+    .status-strong {
+      font-weight: 700;
+    }
+
+    .pt-summary {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pt-summary span {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .pt-money {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .pt-money.plus {
+      color: var(--accent2);
+      text-shadow: 0 0 10px rgba(40,180,135,.4);
+    }
+
+    .pt-money.minus {
+      color: var(--danger);
+      text-shadow: 0 0 10px rgba(255,51,102,.35);
+    }
+
+    .pt-money.zero {
+      color: var(--neutral);
+    }
+
+    .fun-label {
+      font-size: 0.8rem;
+      margin-top: 2px;
+      color: #555;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 480px;
+      font-size: 0.78rem;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid rgba(0,0,0,.08);
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    th {
+      background: rgba(0,0,0,.04);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(0,0,0,.02);
+    }
+
+    .col-highlight {
+      background: rgba(40,180,135,0.10) !important;
+      font-weight: 700;
+    }
+
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+
+    .msg-large {
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-align: center;
+      padding: 20px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.9);
+      border: 2px dashed rgba(0,0,0,.08);
+      color: #444;
+      margin-top: 4px;
+    }
+
+    .msg-large span {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-top: 4px;
+      color: #777;
+    }
+
+    .tag-plus {
+      color: var(--accent2);
+      font-weight: 700;
+    }
+    .tag-minus {
+      color: var(--danger);
+      font-weight: 700;
+    }
+    .tag-zero {
+      color: var(--neutral);
+      font-weight: 700;
+    }
+
+    .pill-current {
+      background: rgba(40,180,135,0.15);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #246a54;
+    }
+
+    .small-note {
+      font-size: 0.7rem;
+      color: #777;
+      margin-top: -2px;
+    }
+
+    @media (min-width: 768px) {
+      .card-grid-2 {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 8px;
+      }
+    }
+/* スコア一覧テーブル（スマホ向け） */
+.table-container-score {
+  overflow-x: auto;
+}
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.score-table th,
+.score-table td {
+  padding: 8px 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.score-table td.name-cell {
+  text-align: left;
+  font-weight: 600;
+}
+
+.score-table tr.row-highlight {
+  background: rgba(255, 153, 0, 0.12);
+}
+@media (max-width: 600px) {
+  header.app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  header.app-header > div:last-child {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .nav-pills {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;      /* 折り返さない */
+    overflow-x: auto;       /* 横にスライドできるように */
+    padding-bottom: 4px;
+    gap: 4px;
+  }
+
+  .pill {
+    white-space: nowrap;
+  }
+}
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 固定レイアウトで詰める */
+  min-width: 0;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 3px 4px;
+  font-size: 0.7rem;
+}
+
+.ranking-table th:nth-child(1),
+.ranking-table td:nth-child(1) {
+  width: 2.5em;   /* 順位 */
+}
+
+.ranking-table th:nth-child(3),
+.ranking-table td:nth-child(3) {
+  width: 4em;    /* pt */
+}
+
+.ranking-table th:nth-child(4),
+.ranking-table td:nth-child(4) {
+  width: 7em;    /* 金額 */
+}
+
+.ranking-table td.text-left {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* 名前が長いときは「…」で切る */
+}
+.vs-badge-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.vs-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(0,0,0,0.04);
+  gap: 3px;
+}
+
+.vs-badge-label {
+  font-weight: 600;
+}
+
+.vs-badge.pt-plus {
+  color: var(--accent2);
+}
+
+.vs-badge.pt-minus {
+  color: var(--danger);
+}
+
+.vs-badge.pt-zero {
+  color: var(--neutral);
+}
+#adminTools {
+  background: #ffd7e0;                 /* 明るいクリーム色 */
+  border: 1px solid #ffb74d;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+
+#adminTools h3 {
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+#btnRenamePlayer {
+  border-color: var(--accent2);
+  color: #246a54;
+  background: #ffffff;
+}
+
+#btnDeleteComp {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: #fff0f5;
+}
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <div class="title-block">
+      <div class="title-main">ピンポンパン　～誇りから憧れへ～</div>
+      <div class="title-sub">小山YEGゴルフ部　非公式アプリ</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+      <div class="chip">
+        <span>モード：</span>
+        <span id="chip-mode">トップ</span>
+      </div>
+      <div class="nav-pills">
+        <button class="pill active" data-view="topView"><span class="icon">🏠</span>Top</button>
+        <button class="pill" data-view="compView"><span class="icon">📅</span>コンペ</button>
+        <button class="pill" data-view="scoreView"><span class="icon">✏️</span>スコア</button>
+        <button class="pill" data-view="resultView"><span class="icon">🏆</span>結果</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- トップ画面 -->
+    <section id="topView" class="view active">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            PPPプロトタイプ
+            <span class="card-title-tag">侠気システム</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field-group">
+            <label for="menuCompSelect">コンペ選択
+            <span class="card-title-tag">今日は何のコンペ？</span>
+            </label>
+            <select id="menuCompSelect"></select>
+            <div class="small-note">
+              過去のコンペも出てるから間違えないで！
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="menuPlayerInput">名前選択
+            <span class="card-title-tag">一度登録した名前はずっと使います</span>
+            </label>
+            <input id="menuPlayerInput" list="playerList" type="text" placeholder="例）山田太郎" />
+            <datalist id="playerList"></datalist>
+            <div class="hint">何文字か入力すると絞り込みできる。自分の名前がないなら入力すれば新規登録👍️</div>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnToScoreFromMenu" class="btn btn-primary">
+              <span>スコア入力へ</span>
+            </button>
+            <button id="btnToResultFromMenu" class="btn btn-ghost">
+              <span>結果発表へ</span>
+            </button>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnToCompFromMenu" class="btn btn-ghost btn-small">
+              📅 新しいコンペを作成
+            </button>
+          </div>
+
+          <div class="status">
+            <span class="status-strong">ヒント：</span>スコア入力したいコンペが表示されない場合は、まずコンペ作成💡
+          </div>
+
+          <!-- ↓↓↓ 管理者用隠しツール（Ctrl+Shift+M で表示切替） ↓↓↓ -->
+          <div id="adminTools" style="display:none;margin-top:10px;padding-top:8px;border-top:1px dashed #ccc;">
+            <div class="section-title">管理者ツール</div>
+            <!-- 参加者名変更 -->
+            <div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(0,0,0,.12);">
+              <label style="font-size:0.75rem;">
+                <input type="checkbox" id="chkShowAllComps">
+                コンペを全件表示する（メニュー／結果発表）
+              </label>
+            </div>
+
+            <!-- 参加者名変更 -->
+            <div class="field-group">
+              <label>参加者名の変更</label>
+              <input type="text" id="renameOld" placeholder="現在の名前（例）山田太郎" />
+              <input type="text" id="renameNew" placeholder="新しい名前（例）山田太郎（幹事）" style="margin-top:4px;" />
+              <button class="btn btn-ghost btn-small" id="btnRenamePlayer" style="margin-top:4px;">
+                参加者名を変更
+              </button>
+              <div class="hint">
+                ※同じ名前が既にある場合は変更できません。（登録済みスコアはすべて新しい名前で表示されます）
+              </div>
+            </div>
+
+            <!-- コンペ削除 -->
+            <div class="field-group" style="margin-top:8px;">
+              <label>コンペ削除（現在選択中）</label>
+              <button class="btn btn-ghost btn-small" id="btnDeleteComp">
+                ⚠ このコンペを削除（スコアも全削除）
+              </button>
+              <div class="hint">
+                ※2回確認のうえ削除します。scores テーブルのデータもすべて削除されます。
+              </div>
+            </div>
+          </div>
+          <!-- ↑↑↑ 管理者用隠しツール ↑↑↑ -->
+        </div>
+      </div>
+    </section>
+
+    <!-- コンペ作成画面 -->
+    <section id="compView" class="view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            コンペ作成
+            <span class="card-title-tag">開催日、名称、金額を設定</span>
+          </div>
+          <button class="btn btn-ghost btn-small" data-view="topView">← Topへ戻る</button>
+        </div>
+        <div class="card-body">
+          <div class="card-grid-2">
+            <div>
+              <div class="field-group">
+                <label for="compDate">開催日</label>
+                <input id="compDate" type="date" />
+                <div class="hint" id="compDateWarekiHint"></div>
+              </div>
+
+              <div class="field-group">
+                <label for="compName">コンペ名（20文字まで）</label>
+                <input id="compName" type="text" maxlength="20" placeholder="例）春の小山YEG杯" />
+              </div>
+
+              <div class="field-group">
+                <label for="compPtValue">掛け金（円）</label>
+                <input id="compPtValue" type="number" min="0" step="100" value="1000" />
+                <div class="hint">だいたい1000円</div>
+              </div>
+            </div>
+            <div>
+              <div id="compExistingInfo" class="hint"></div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnSaveComp" class="btn btn-primary">コンペを登録 / 更新</button>
+            <button class="btn btn-ghost btn-small" id="btnCompClear">
+              入力クリア
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- スコア入力画面 -->
+    <section id="scoreView" class="view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            スコア入力
+            <span class="card-title-tag">IN / OUT / ハンデ</span>
+          </div>
+          <button class="btn btn-ghost btn-small" data-view="topView">← Topへ戻る</button>
+        </div>
+        <div class="card-body">
+          <div class="field-group">
+            <div class="section-title">対象コンペ</div>
+            <div id="scoreCompInfo" class="badge">
+              未選択です。何やってんの💢戻って選んでこい💢
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="scorePlayerInput">名前選択
+            <span class="card-title-tag">インチキ禁止</span>
+            </label>
+            <input id="scorePlayerInput" list="playerList" type="text" placeholder="例）山田太郎" />
+            <div class="hint">入力すると候補から絞り込み。新しい名前はそのまま登録されます。</div>
+          </div>
+
+          <div class="field-group">
+            <label for="inScore">IN スコア</label>
+            <input id="inScore" type="number" min="0" />
+          </div>
+
+          <div class="field-group">
+            <label for="outScore">OUT スコア</label>
+            <input id="outScore" type="number" min="0" />
+          </div>
+
+          <div class="field-group">
+            <label for="handicap">ハンデ（整数・±あり）</label>
+            <input id="handicap" type="number" step="2" value="0" />
+            <div class="hint">ハンデ10 → IN+5 / OUT+5、ハンデ-10 → IN-5 / OUT-5 で計算します。</div>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnSaveScore" class="btn btn-primary">スコアを登録 / 更新</button>
+            <button id="btnLoadScore" class="btn btn-ghost btn-small">この参加者のスコアを読み込み</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 結果発表画面 -->
+    <section id="resultView" class="view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            結果発表
+            <span class="card-title-tag">ピンポンパン採点</span>
+          </div>
+          <button class="btn btn-ghost btn-small" data-view="topView">← Topへ戻る</button>
+        </div>
+        <div class="card-body">
+          <div class="field-group">
+            <label for="resultCompSelect">コンペ選択
+            <span class="card-title-tag">どのコンペの結果ですか？</span>
+            </label>
+            <select id="resultCompSelect"></select>
+          </div>
+
+          <div class="field-group">
+            <label for="resultPlayerSelect">名前選択
+            <span class="card-title-tag">誰の結果を見ますか？</span>
+            </label>
+            <select id="resultPlayerSelect"></select>
+            <div class="hint">このコンペでスコアが登録されていないと選べないよ</div>
+          </div>
+
+          <div id="resultMain"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // ==========================
+  // Supabase 初期化
+  // ==========================
+  const { createClient } = supabase;
+
+  // ★ここをあなたのプロジェクトの値に差し替え★
+  const SUPABASE_URL = 'https://eszagvoyihjkrwvurlad.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzemFndm95aWhqa3J3dnVybGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxOTQ0NjIsImV4cCI6MjA3ODc3MDQ2Mn0.LHD3ObTz6hmaEGUFTluOp7y5cv7aMxDpYNr-vO7nYKo';
+
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ==========================
+  // 汎用ユーティリティ
+  // ==========================
+  function toWarekiShort(dateISO) {
+    if (!dateISO) return '';
+    const [y, m, d] = dateISO.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+
+    const heiseiStart = new Date(1989, 0, 8);
+    const reiwaStart = new Date(2019, 4, 1);
+
+    let era = '';
+    let year = y;
+
+    if (date >= reiwaStart) {
+      era = 'R';
+      year = y - 2018;
+    } else if (date >= heiseiStart) {
+      era = 'H';
+      year = y - 1988;
+    } else {
+      era = 'S';
+      year = y - 1925;
+    }
+
+    return `${era}${year}/${m}/${d}`;
+  }
+
+  let currentCompId = null;
+  let currentPlayerName = '';
+
+// ★コンペ表示モード：false = 直近半年 / true = 全件
+let showAllCompetitions = false;
+
+  // ==========================
+  // 画面切り替え
+  // ==========================
+  const views = {
+    topView: document.getElementById('topView'),
+    compView: document.getElementById('compView'),
+    scoreView: document.getElementById('scoreView'),
+    resultView: document.getElementById('resultView')
+  };
+
+  const chipMode = document.getElementById('chip-mode');
+// 上部ナビ（pill）用
+const pills = document.querySelectorAll('.pill[data-view]');
+pills.forEach(p => {
+  p.addEventListener('click', () => {
+    const targetView = p.dataset.view;
+
+    if (targetView === 'scoreView' || targetView === 'resultView') {
+      const compFromMenu = menuCompSelect.value;
+      if (compFromMenu) currentCompId = compFromMenu;
+
+      const playerFromMenu = menuPlayerInput.value.trim();
+      if (playerFromMenu) {
+        currentPlayerName = playerFromMenu;
+        scorePlayerInput.value = playerFromMenu;
+        // 結果発表側は renderResultMain 内で currentPlayerName から反映します
+      }
+    }
+
+    showView(targetView);
+  });
+});
+
+function showView(id) {
+  Object.values(views).forEach(v => v.classList.remove('active'));
+  views[id].classList.add('active');
+
+  pills.forEach(p => {
+    if (p.dataset.view === id) p.classList.add('active');
+    else p.classList.remove('active');
+  });
+
+  let modeLabel = '';
+  switch (id) {
+    case 'topView': modeLabel = 'トップ'; break;
+    case 'compView': modeLabel = 'コンペ作成'; break;
+    case 'scoreView': modeLabel = 'スコア入力'; break;
+    case 'resultView': modeLabel = '結果発表'; break;
+  }
+  chipMode.textContent = modeLabel;
+
+  if (id === 'topView') {
+    refreshMenuCompSelect();
+  } else if (id === 'scoreView') {
+    updateScoreCompInfo();
+    // ★ ここを追加：名前が入っていれば自動読み込み
+    if (scorePlayerInput.value.trim()) {
+      loadScoreForCurrentPlayer();
+    }
+  } else if (id === 'resultView') {
+    refreshResultCompSelect();
+    renderResultMain();
+  }
+}
+
+
+  // ==========================
+  // トップ画面
+  // ==========================
+  const menuCompSelect = document.getElementById('menuCompSelect');
+  const menuPlayerInput = document.getElementById('menuPlayerInput');
+  const playerDatalist = document.getElementById('playerList');
+
+// 管理ツール（参加者名変更）
+const chkShowAllComps = document.getElementById('chkShowAllComps');
+if (chkShowAllComps) {
+  chkShowAllComps.addEventListener('change', async (e) => {
+    showAllCompetitions = e.target.checked;
+    await refreshMenuCompSelect();
+    await refreshResultCompSelect(); // ← これを復活
+  });
+}
+const renameOldInput = document.getElementById('renameOld');
+const renameNewInput = document.getElementById('renameNew');
+const btnRenamePlayer = document.getElementById('btnRenamePlayer');
+
+const btnDeleteComp = document.getElementById('btnDeleteComp');
+
+  async function fetchPlayers() {
+    const { data, error } = await db.from('players').select('*').order('name', { ascending: true });
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data || [];
+  }
+
+  async function refreshPlayerDatalist() {
+    const players = await fetchPlayers();
+    playerDatalist.innerHTML = '';
+    players.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      playerDatalist.appendChild(opt);
+    });
+  }
+
+async function fetchCompetitionsAll() {
+  const { data, error } = await db
+    .from('competitions')
+    .select('*')
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  const rows = data || [];
+
+  // 「コンペ名 ＋ 日付」が同じものは1件にまとめる
+  const seen = new Set();
+  const deduped = [];
+  for (const c of rows) {
+    const key = `${c.name}__${c.date}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(c);
+    }
+  }
+
+  return deduped;
+}
+
+async function refreshMenuCompSelect() {
+  const select = menuCompSelect;
+
+  // いま選ばれているID（または currentCompId）を覚えておく
+  const prevSelected =
+    currentCompId ||
+    (select ? select.value : '') ||
+    '';
+
+  select.innerHTML = '';
+  //select.length = 0;
+
+  const compsSorted = await fetchCompetitionsAll();
+//alert("トップ" + compsSorted.length);
+  if (compsSorted.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'コンペがまだ登録されていません';
+    select.appendChild(opt);
+    currentCompId = null;
+    return;
+  }
+
+  const now = new Date();
+  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+  const filtered = compsSorted.filter(c => new Date(c.date) >= sixMonthsAgo);
+  //const compsToShow = filtered.length ? filtered : compsSorted;
+  // ★フラグに応じて「半年分」or「全件」
+  const compsToShow = showAllCompetitions
+    ? compsSorted
+    : (filtered.length ? filtered : compsSorted);
+
+  compsToShow.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name}　${toWarekiShort(c.date)}`;
+    select.appendChild(opt);
+  });
+
+  // ① 以前選んでいたコンペがあれば、それを優先
+  let targetId = prevSelected && compsToShow.some(c => c.id === prevSelected)
+    ? prevSelected
+    : null;
+
+  // ② なければ「今日のコンペ」→なければ最新コンペ
+  if (!targetId) {
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const todayComp = compsToShow.find(c => c.date === todayISO);
+    const fallback = todayComp || compsToShow[0];
+    targetId = fallback.id;
+  }
+
+  select.value = targetId;
+  currentCompId = targetId;
+//alert('トップoptions:' + [...menuCompSelect.options].map(o => o.textContent));
+
+}
+
+  document.getElementById('btnToScoreFromMenu').addEventListener('click', () => {
+    const compId = menuCompSelect.value;
+    if (!compId) {
+      alert('コンペを選択してください。');
+      return;
+    }
+    currentCompId = compId;
+    currentPlayerName = menuPlayerInput.value.trim();
+    document.getElementById('scorePlayerInput').value = currentPlayerName;
+    showView('scoreView');
+  });
+
+  document.getElementById('btnToResultFromMenu').addEventListener('click', () => {
+    const compId = menuCompSelect.value;
+    if (!compId) {
+      alert('コンペを選択してください。');
+      return;
+    }
+    currentCompId = compId;
+    currentPlayerName = menuPlayerSelect.value;
+    document.getElementById('resultPlayerSelect').value = currentPlayerName;
+    showView('resultView');
+  });
+
+  document.getElementById('btnToCompFromMenu').addEventListener('click', () => {
+    showView('compView');
+  });
+
+  // ==========================
+  // コンペ作成画面
+  // ==========================
+  const compDateInput = document.getElementById('compDate');
+  const compNameInput = document.getElementById('compName');
+  const compPtValueInput = document.getElementById('compPtValue');
+  const compDateWarekiHint = document.getElementById('compDateWarekiHint');
+  const compExistingInfo = document.getElementById('compExistingInfo');
+
+  compDateInput.addEventListener('change', async () => {
+    const dateISO = compDateInput.value;
+    if (!dateISO) {
+      compDateWarekiHint.textContent = '';
+      compExistingInfo.textContent = '';
+      return;
+    }
+    const wareki = toWarekiShort(dateISO);
+    compDateWarekiHint.textContent = `和暦表記：${wareki}`;
+
+    const { data, error } = await db.from('competitions').select('*').eq('date', dateISO);
+    if (error) {
+      console.error(error);
+      return;
+    }
+if (data && data.length > 0) {
+  const first = data[0];
+
+  // 1件目をフォームに反映
+  compNameInput.value = first.name;
+  compPtValueInput.value = first.pt_value;
+
+  // その日に登録されているコンペ一覧を表示
+  const listHtml = data.map(c =>
+    `・${c.name}（${toWarekiShort(c.date)}／1pt=${c.pt_value.toLocaleString()}円）`
+  ).join('<br>');
+
+  compExistingInfo.innerHTML = `
+    <div>この開催日には以下のコンペが登録されています。</div>
+    <div style="margin:4px 0 6px 0;">${listHtml}</div>
+    <div>
+      <label style="display:block;font-size:0.8rem;">
+        <input type="radio" name="compMode" value="edit" checked>
+        上の内容（最初のコンペ「${first.name}」）を修正する
+      </label>
+      <label style="display:block;font-size:0.8rem;margin-top:2px;">
+        <input type="radio" name="compMode" value="new">
+        別のコンペとして新規登録する
+      </label>
+    </div>
+  `;
+} else {
+  compExistingInfo.innerHTML = '';
+}
+
+  });
+
+  document.getElementById('btnSaveComp').addEventListener('click', async () => {
+    const dateISO = compDateInput.value;
+    const name = compNameInput.value.trim();
+    const ptValue = parseInt(compPtValueInput.value, 10) || 0;
+
+    if (!dateISO) {
+      alert('開催日を入力してください。');
+      return;
+    }
+    if (!name) {
+      alert('コンペ名を入力してください。');
+      return;
+    }
+
+    const wareki = toWarekiShort(dateISO);
+    const { data: existing, error } = await db.from('competitions').select('*').eq('date', dateISO);
+    if (error) {
+      console.error(error);
+      alert('コンペ情報の取得に失敗しました。');
+      return;
+    }
+
+if (existing && existing.length > 0) {
+  const first = existing[0];
+
+  // compMode ラジオボタンの選択を取得（なければ edit 扱い）
+  let mode = 'edit';
+  const radios = document.querySelectorAll('input[name="compMode"]');
+  radios.forEach(r => {
+    if (r.checked) mode = r.value;
+  });
+
+  if (mode === 'edit') {
+    const { error: updErr } = await db.from('competitions')
+      .update({ name, pt_value: ptValue })
+      .eq('id', first.id);
+    if (updErr) {
+      console.error(updErr);
+      alert('コンペの更新に失敗しました。');
+      return;
+    }
+    alert('コンペ内容を更新しました。');
+  } else {
+    const { error: insErr } = await db.from('competitions')
+      .insert({ name, date: dateISO, pt_value: ptValue });
+    if (insErr) {
+      console.error(insErr);
+      alert('コンペの登録に失敗しました。');
+      return;
+    }
+    alert('コンペを新規登録しました。');
+  }
+} else {
+  const { error: insErr } = await db.from('competitions')
+    .insert({ name, date: dateISO, pt_value: ptValue });
+  if (insErr) {
+    console.error(insErr);
+    alert('コンペの登録に失敗しました。');
+    return;
+  }
+  alert('コンペを登録しました。');
+}
+
+    //refreshMenuCompSelect();
+    //refreshResultCompSelect();
+    // ★ ここを追加：登録後はトップへ
+    showView('topView');
+  });
+
+  document.getElementById('btnCompClear').addEventListener('click', () => {
+    compDateInput.value = '';
+    compNameInput.value = '';
+    compPtValueInput.value = 1000;
+    compDateWarekiHint.textContent = '';
+    compExistingInfo.textContent = '';
+  });
+
+  // ==========================
+  // スコア入力画面
+  // ==========================
+  const scoreCompInfo = document.getElementById('scoreCompInfo');
+  const scorePlayerInput = document.getElementById('scorePlayerInput');
+  const inScoreInput = document.getElementById('inScore');
+  const outScoreInput = document.getElementById('outScore');
+  const handicapInput = document.getElementById('handicap');
+
+  async function updateScoreCompInfo() {
+    if (!currentCompId) {
+      scoreCompInfo.textContent = 'コンペが選択されていません。何やってんの💢戻ってコンペを選んでこい💢';
+      return;
+    }
+    const { data: comp, error } = await db.from('competitions').select('*').eq('id', currentCompId).maybeSingle();
+    if (error || !comp) {
+      scoreCompInfo.textContent = 'コンペ情報が見つかりません。';
+      return;
+    }
+    scoreCompInfo.innerHTML = `<span class="pill-current">${comp.name}</span>　${toWarekiShort(comp.date)}　1pt = ${comp.pt_value.toLocaleString()} 円`;
+  }
+
+  async function getPlayerByName(name) {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+    const { data, error } = await db.from('players').select('*').eq('name', trimmed).maybeSingle();
+    if (error) {
+      console.error(error);
+      return null;
+    }
+    return data || null;
+  }
+
+  async function getOrCreatePlayerByName(name) {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+    let player = await getPlayerByName(trimmed);
+    if (player) return player;
+
+    const { data, error } = await db.from('players')
+      .insert({ name: trimmed })
+      .select()
+      .single();
+    if (error) {
+      console.error(error);
+      alert('名前の登録に失敗しました。');
+      return null;
+    }
+    await refreshPlayerDatalist();
+    return data;
+  }
+
+btnRenamePlayer.addEventListener('click', async () => {
+  const oldName = renameOldInput.value.trim();
+  const newName = renameNewInput.value.trim();
+
+  if (!oldName || !newName) {
+    alert('現在の名前と新しい名前の両方を入力してください。');
+    return;
+  }
+  if (oldName === newName) {
+    alert('同じ名前には変更できません。');
+    return;
+  }
+
+  // ① 現在の名前のプレイヤーを取得
+  const { data: oldPlayer, error: oldErr } = await db
+    .from('players')
+    .select('*')
+    .eq('name', oldName)
+    .maybeSingle();
+
+  if (oldErr) {
+    console.error(oldErr);
+    alert('現在の名前の確認に失敗しました。');
+    return;
+  }
+  if (!oldPlayer) {
+    alert(`「${oldName}」という参加者が見つかりません。`);
+    return;
+  }
+
+  // ② 新しい名前が既に存在しないかチェック（重複禁止）
+  const { data: dup, error: dupErr } = await db
+    .from('players')
+    .select('id')
+    .eq('name', newName)
+    .maybeSingle();
+
+  if (dupErr) {
+    console.error(dupErr);
+    alert('重複チェックに失敗しました。');
+    return;
+  }
+  if (dup) {
+    alert(`「${newName}」という参加者名は既に登録されています。別の名前にしてください。`);
+    return;
+  }
+
+  // ③ 確認
+  const ok = confirm(
+    `参加者名を変更します。\n\n「${oldName}」 → 「${newName}」\n\n` +
+    'これまでのスコアの表示もすべて新しい名前になります。よろしいですか？'
+  );
+  if (!ok) return;
+
+  // ④ players テーブルの名前を更新
+  const { error: updErr } = await db
+    .from('players')
+    .update({ name: newName })
+    .eq('id', oldPlayer.id);
+
+  if (updErr) {
+    console.error(updErr);
+    alert('名前の変更に失敗しました。');
+    return;
+  }
+
+  // ⑤ 名前候補リストや入力欄を更新
+  await refreshPlayerDatalist();
+
+  if (menuPlayerInput.value.trim() === oldName) menuPlayerInput.value = newName;
+  if (scorePlayerInput.value.trim() === oldName) scorePlayerInput.value = newName;
+  if (resultPlayerSelect.value.trim() === oldName) resultPlayerSelect.value = newName;
+
+  alert('参加者名を変更しました。');
+});
+
+btnDeleteComp.addEventListener('click', async () => {
+  const compId = menuCompSelect.value || currentCompId;
+
+  if (!compId) {
+    alert('削除するコンペが選択されていません。メニューでコンペを選んでください。');
+    return;
+  }
+
+  // 対象コンペの情報を取得
+  const { data: comp, error } = await db
+    .from('competitions')
+    .select('*')
+    .eq('id', compId)
+    .maybeSingle();
+
+  if (error || !comp) {
+    console.error(error);
+    alert('コンペ情報の取得に失敗しました。');
+    return;
+  }
+
+  const compLabel = `${comp.name}（${toWarekiShort(comp.date)}）`;
+
+  // 2段階確認
+  const ok1 = confirm(
+    `「${compLabel}」を削除しようとしています。\n\n` +
+    'このコンペに紐づくスコアもすべて削除されます。\n\n' +
+    '本当に削除してよろしいですか？'
+  );
+  if (!ok1) return;
+
+  const ok2 = confirm(
+    '【最終確認】\n\n' +
+    `「${compLabel}」を本当に削除しますか？\n\n` +
+    'この操作は元に戻せません。'
+  );
+  if (!ok2) return;
+
+  // competitions を削除（scores は on delete cascade で一緒に削除される）
+  const { error: delErr } = await db
+    .from('competitions')
+    .delete()
+    .eq('id', compId);
+
+  if (delErr) {
+    console.error(delErr);
+    alert('コンペの削除に失敗しました。');
+    return;
+  }
+
+  alert('コンペを削除しました。（紐づくスコアも削除されています）');
+
+  currentCompId = null;
+  await refreshMenuCompSelect();
+  await refreshResultCompSelect();
+  resultMain.innerHTML = '';
+  showView('topView');
+});
+
+  async function loadScoreForCurrentPlayer() {
+    const name = scorePlayerInput.value.trim();
+    if (!name) {
+      alert('名前を入力してください。何やってんの💢');
+      return;
+    }
+    if (!currentCompId) {
+      alert('コンペが選択されていません。何やってんの💢');
+      return;
+    }
+    const player = await getPlayerByName(name);
+    if (!player) {
+      inScoreInput.value = '';
+      outScoreInput.value = '';
+      handicapInput.value = '';
+      return;
+    }
+    const { data, error } = await db.from('scores')
+      .select('*')
+      .eq('competition_id', currentCompId)
+      .eq('player_id', player.id)
+      .maybeSingle();
+    if (error) {
+      console.error(error);
+      alert('スコアの取得に失敗しました。');
+      return;
+    }
+    if (!data) {
+      inScoreInput.value = '';
+      outScoreInput.value = '';
+      handicapInput.value = '';
+    } else {
+      inScoreInput.value = data.in_score;
+      outScoreInput.value = data.out_score;
+      handicapInput.value = data.handicap;
+    }
+  }
+
+  document.getElementById('btnLoadScore').addEventListener('click', () => {
+    loadScoreForCurrentPlayer();
+  });
+
+  document.getElementById('btnSaveScore').addEventListener('click', async () => {
+    if (!currentCompId) {
+      alert('コンペが選択されていません。何やってんの💢');
+      return;
+    }
+    const name = scorePlayerInput.value.trim();
+    if (!name) {
+      alert('参加者名を入力してください。');
+      return;
+    }
+    const inScore = parseInt(inScoreInput.value, 10);
+    const outScore = parseInt(outScoreInput.value, 10);
+    const handicap = parseInt(handicapInput.value, 10) || 0;
+
+    if (isNaN(inScore) || inScore < 0) {
+      alert('INスコアを0以上の数字で入力してください。わかるでしょ💢');
+      return;
+    }
+    if (isNaN(outScore) || outScore < 0) {
+      alert('OUTスコアを0以上の数字で入力してください。バカなの💢');
+      return;
+    }
+    if (handicap % 2 !== 0) {
+      alert('ハンデは偶数で入力してください。わかるでしょ💢');
+      return;
+    }
+
+    const player = await getOrCreatePlayerByName(name);
+    if (!player) return;
+
+    const { data: existing, error } = await db.from('scores')
+      .select('*')
+      .eq('competition_id', currentCompId)
+      .eq('player_id', player.id)
+      .maybeSingle();
+    if (error) {
+      console.error(error);
+      alert('スコアの確認に失敗しました。');
+      return;
+    }
+
+    if (existing) {
+      const { error: updErr } = await db.from('scores')
+        .update({
+          in_score: inScore,
+          out_score: outScore,
+          handicap,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id);
+      if (updErr) {
+        console.error(updErr);
+        alert('スコアの更新に失敗しました。');
+        return;
+      }
+    } else {
+      const { error: insErr } = await db.from('scores')
+        .insert({
+          competition_id: currentCompId,
+          player_id: player.id,
+          in_score: inScore,
+          out_score: outScore,
+          handicap
+        });
+      if (insErr) {
+        console.error(insErr);
+        alert('スコアの登録に失敗しました。');
+        return;
+      }
+    }
+
+    alert('スコアを保存しました。');
+  });
+
+  scorePlayerInput.addEventListener('change', () => {
+    loadScoreForCurrentPlayer();
+  });
+
+  // ==========================
+  // 結果発表画面
+  // ==========================
+  const resultCompSelect = document.getElementById('resultCompSelect');
+  const resultPlayerSelect = document.getElementById('resultPlayerSelect');
+  const resultMain = document.getElementById('resultMain');
+
+function syncRenameOldFromName(name) {
+  if (!name) return;
+  renameOldInput.value = name;
+}
+
+// トップ画面の名前入力
+menuPlayerInput.addEventListener('input', () => {
+  syncRenameOldFromName(menuPlayerInput.value.trim());
+});
+
+// スコア入力画面の名前入力
+scorePlayerInput.addEventListener('input', () => {
+  syncRenameOldFromName(scorePlayerInput.value.trim());
+});
+
+// 結果発表画面の参加者選択
+resultPlayerSelect.addEventListener('change', () => {
+  syncRenameOldFromName(resultPlayerSelect.value);
+});
+
+async function refreshResultCompSelect() {
+  const select = resultCompSelect;
+  select.innerHTML = '';
+
+  const compsSorted = await fetchCompetitionsAll();
+
+  if (compsSorted.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'コンペがまだ登録されていません';
+    select.appendChild(opt);
+    currentCompId = null;
+    return;
+  }
+//alert("fetchCompetitionsAll()::" + compsSorted.length);
+  compsSorted.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name}　${toWarekiShort(c.date)}`;
+    select.appendChild(opt);
+  });
+
+  let targetId = currentCompId;
+
+  const menuSelectedId = menuCompSelect.value;
+
+  if (!targetId || !compsSorted.some(c => c.id === targetId)) {
+    if (menuSelectedId && compsSorted.some(c => c.id === menuSelectedId)) {
+      targetId = menuSelectedId;
+    } else {
+      targetId = compsSorted[0].id;
+    }
+  }
+
+  select.value = targetId;
+  currentCompId = targetId;
+//alert('options:'+ [...menuCompSelect.options].map(o => o.textContent));
+
+}
+
+  resultCompSelect.addEventListener('change', () => {
+    currentCompId = resultCompSelect.value;
+    renderResultMain();
+  });
+
+  resultPlayerSelect.addEventListener('change', () => {
+    currentPlayerName = resultPlayerSelect.value;
+    renderResultMain();
+  });
+
+  function calcAdjustedScores(scoreRow) {
+    const halfHd = scoreRow.handicap / 2;
+    const inAdj = scoreRow.in_score + halfHd;
+    const outAdj = scoreRow.out_score + halfHd;
+    return {
+      inAdj,
+      outAdj,
+      totalAdj: inAdj + outAdj
+    };
+  }
+
+  function compareTwoPlayers(scoreA, scoreB) {
+    const adjA = calcAdjustedScores(scoreA);
+    const adjB = calcAdjustedScores(scoreB);
+
+    function oneDim(a, b) {
+      if (a < b) return 1;
+      if (a > b) return -1;
+      return 0;
+    }
+
+    const inRes = oneDim(adjA.inAdj, adjB.inAdj);
+    const outRes = oneDim(adjA.outAdj, adjB.outAdj);
+    const totalRes = oneDim(adjA.totalAdj, adjB.totalAdj);
+
+    return {
+      a: { in: inRes, out: outRes, total: totalRes, sum: inRes + outRes + totalRes },
+      b: { in: -inRes, out: -outRes, total: -totalRes, sum: -(inRes + outRes + totalRes) }
+    };
+  }
+
+  async function renderResultMain() {
+    resultMain.innerHTML = '';
+
+    if (!currentCompId) {
+      resultMain.innerHTML = '<div class="msg-large">コンペがまだ選択されていません。</div>';
+      return;
+    }
+
+    const { data: comp, error: compErr } = await db.from('competitions').select('*').eq('id', currentCompId).maybeSingle();
+    if (compErr || !comp) {
+      resultMain.innerHTML = '<div class="msg-large">コンペ情報が見つかりません。</div>';
+      return;
+    }
+
+    const { data: scores, error: scoreErr } = await db.from('scores').select('*').eq('competition_id', currentCompId);
+    if (scoreErr) {
+      console.error(scoreErr);
+      resultMain.innerHTML = '<div class="msg-large">スコアの取得に失敗しました。</div>';
+      return;
+    }
+    if (!scores || scores.length === 0) {
+      resultMain.innerHTML = '<div class="msg-large">このコンペにはまだスコアが登録されていません。<span>スコア入力画面から入力してください。</span></div>';
+      return;
+    }
+
+    const playerIds = Array.from(new Set(scores.map(s => s.player_id)));
+    const { data: players, error: playerErr } = await db.from('players').select('*').in('id', playerIds);
+    if (playerErr) {
+      console.error(playerErr);
+      resultMain.innerHTML = '<div class="msg-large">参加者情報の取得に失敗しました。</div>';
+      return;
+    }
+
+  let prevFocusName = currentPlayerName || resultPlayerSelect.value || '';
+
+  resultPlayerSelect.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = '参加者を選択してください';
+  resultPlayerSelect.appendChild(ph);
+
+  players
+    .sort((a, b) => a.name.localeCompare(b.name, 'ja'))
+    .forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name;
+      resultPlayerSelect.appendChild(opt);
+    });
+
+  if (!prevFocusName || !players.some(p => p.name === prevFocusName)) {
+    // 初回 or 無効なら先頭をデフォルトに
+    prevFocusName = players[0]?.name || '';
+  }
+
+  resultPlayerSelect.value = prevFocusName;
+  currentPlayerName = prevFocusName;
+
+  const focusName = prevFocusName;
+
+  const focusPlayer = players.find(p => p.name === focusName);
+  if (!focusPlayer) {
+    resultMain.innerHTML = `
+      <div class="msg-large">
+        参加者を選択してください。
+        <span>このコンペにスコア登録してないなら早くしなさい。</span>
+      </div>`;
+    return;
+  }
+
+    const scoreByPlayer = {};
+    scores.forEach(s => { scoreByPlayer[s.player_id] = s; });
+
+    const totalPts = {};
+    playerIds.forEach(id => totalPts[id] = 0);
+
+    for (let i = 0; i < playerIds.length; i++) {
+      for (let j = i + 1; j < playerIds.length; j++) {
+        const idA = playerIds[i];
+        const idB = playerIds[j];
+        const sA = scoreByPlayer[idA];
+        const sB = scoreByPlayer[idB];
+        if (!sA || !sB) continue;
+        const result = compareTwoPlayers(sA, sB);
+        totalPts[idA] += result.a.sum;
+        totalPts[idB] += result.b.sum;
+      }
+    }
+
+    const vsMap = {};
+    playerIds.forEach(id => {
+      if (id === focusPlayer.id) return;
+      const sF = scoreByPlayer[focusPlayer.id];
+      const sO = scoreByPlayer[id];
+      if (!sF || !sO) return;
+      const res = compareTwoPlayers(sF, sO);
+      vsMap[id] = res.a;
+    });
+
+    const focusTotalPt = totalPts[focusPlayer.id] || 0;
+    const money = focusTotalPt * comp.pt_value;
+
+    // 1. 合計pt & 金額
+    const summaryCard = document.createElement('div');
+    summaryCard.className = 'card';
+    summaryCard.innerHTML = `
+      <div class="card-header">
+        <div class="card-title">
+          合計勝ち点＆金額
+          <span class="card-title-tag">${comp.name}　${toWarekiShort(comp.date)}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pt-summary">
+          ${focusPlayer.name} の合計勝ち点：
+          <span>${focusTotalPt > 0 ? '+' : ''}${focusTotalPt} pt</span>
+        </div>
+        <div class="pt-money ${money > 0 ? 'plus' : money < 0 ? 'minus' : 'zero'}">
+          ${money > 0 ? '+' : money < 0 ? '-' : ''}${Math.abs(money).toLocaleString()} 円
+        </div>
+        <div class="fun-label">
+          ${money > 0
+            ? '今日はごちそう候補ですね。勝ち越しおめでとうございます！'
+            : money < 0
+              ? '今日は少し持ち出し…？次回の巻き返しに期待！'
+              : 'プラマイゼロ。見事なバランスゲームです。'}
+        </div>
+      </div>
+    `;
+    resultMain.appendChild(summaryCard);
+
+    // 2. 参加者一覧
+    const rankingCard = document.createElement('div');
+    rankingCard.className = 'card';
+    const rankingRows = players
+      .map(p => {
+        const pt = totalPts[p.id] || 0;
+        const moneyP = pt * comp.pt_value;
+        return { p, pt, money: moneyP };
+      })
+      .sort((a, b) => b.pt - a.pt);
+
+    let rankingHtml = `
+      <div class="card-header">
+        <div class="card-title">
+          このコンペの全参加者
+          <span class="card-title-tag">合計ptと金額</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-container">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>順位</th>
+                <th>参加者</th>
+                <th>合計pt</th>
+                <th>金額</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rankingRows.forEach((r, idx) => {
+      const cls = r.p.id === focusPlayer.id ? 'col-highlight' : '';
+      rankingHtml += `
+        <tr>
+          <td class="${cls}">${idx + 1}</td>
+          <td class="text-left ${cls}">${r.p.name}</td>
+          <td class="${cls}">${r.pt > 0 ? '+' : r.pt < 0 ? '-' : ''}${Math.abs(r.pt)}</td>
+          <td class="text-right ${cls}">${r.money > 0 ? '+' : r.money < 0 ? '-' : ''}${Math.abs(r.money).toLocaleString()} 円</td>
+        </tr>
+      `;
+    });
+
+    rankingHtml += `
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    rankingCard.innerHTML = rankingHtml;
+    resultMain.appendChild(rankingCard);
+
+// 3. フォーカス vs 各参加者（IN / OUT / 合計をバッジで横並び）
+const vsCard = document.createElement('div');
+vsCard.className = 'card';
+
+let vsHtml = `
+  <div class="card-header">
+    <div class="card-title">
+      ${focusPlayer.name} の対戦成績
+      <span class="card-title-tag">IN / OUT / 合計 ＋ 総合pt</span>
+    </div>
+  </div>
+  <div class="card-body">
+`;
+
+const opponents = players.filter(p => p.id !== focusPlayer.id && vsMap[p.id]);
+
+if (opponents.length === 0) {
+  vsHtml += '<div class="hint">比較できる相手がいません。</div>';
+} else {
+  const formatSum = (n) =>
+    n > 0 ? `<span class="tag-plus">+${n}</span>` :
+    n < 0 ? `<span class="tag-minus">${n}</span>` :
+            `<span class="tag-zero">0</span>`;
+
+  const badgeClass = (n) =>
+    n > 0 ? 'pt-plus' :
+    n < 0 ? 'pt-minus' : 'pt-zero';
+
+  const badgeText = (n) =>
+    n > 0 ? '+1' :
+    n < 0 ? '-1' : '0';
+
+  opponents.forEach(o => {
+    const v = vsMap[o.id];
+    const vsSum = v.in + v.out + v.total;
+
+    // 勝ち負けアイコン
+    let statusIcon = '⚪';
+    let statusText = '引き分け';
+    if (vsSum > 0) {
+      statusIcon = '🏆';
+      statusText = '勝ち';
+    } else if (vsSum < 0) {
+      statusIcon = '💧';
+      statusText = '負け';
+    }
+
+    vsHtml += `
+      <div class="card" style="padding:10px;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:4px;">
+          ■ ${o.name}
+          <span style="margin-left:6px;font-size:0.8rem;">
+            ${statusIcon} ${statusText}（総合pt：${formatSum(vsSum)}）
+          </span>
+        </div>
+        <div class="vs-badge-row">
+          <span class="vs-badge ${badgeClass(v.in)}">
+            <span class="vs-badge-label">IN</span>
+            <span>${badgeText(v.in)}</span>
+          </span>
+          <span class="vs-badge ${badgeClass(v.out)}">
+            <span class="vs-badge-label">OUT</span>
+            <span>${badgeText(v.out)}</span>
+          </span>
+          <span class="vs-badge ${badgeClass(v.total)}">
+            <span class="vs-badge-label">合計</span>
+            <span>${badgeText(v.total)}</span>
+          </span>
+        </div>
+      </div>
+    `;
+  });
+}
+
+vsHtml += `</div>`;
+vsCard.innerHTML = vsHtml;
+resultMain.appendChild(vsCard);
+
+    // 4. スコア一覧
+    // 4. スコア一覧（参加者を行にした縦長テーブル）
+    const scoreCard = document.createElement('div');
+    scoreCard.className = 'card';
+
+    // 各プレイヤーの値をまとめる
+    const valueByPlayer = {};
+    players.forEach(p => {
+      const s = scoreByPlayer[p.id];
+      const adj = calcAdjustedScores(s);
+      valueByPlayer[p.id] = {
+        inScore: s.in_score,
+        outScore: s.out_score,
+        rawTotal: s.in_score + s.out_score,
+        handicap: s.handicap,
+        inAdj: adj.inAdj,
+        outAdj: adj.outAdj,
+        totalAdj: adj.totalAdj
+      };
+    });
+
+    // テーブルヘッダー（列）定義
+    const headerCols = [
+      '参加者',
+      'IN',
+      'OUT',
+      '合計',
+      'HD',
+      'INハンデ',
+      'OUTハンデ',
+      '合計ハンデ'
+    ];
+
+    let scoreHtml = `
+      <div class="card-header">
+        <div class="card-title">
+          スコア一覧
+          <span class="card-title-tag">ハンデ込みのスコア</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-container table-container-score">
+          <table class="score-table">
+            <thead>
+              <tr>
+                ${headerCols.map(h => `<th>${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // 参加者ごとに1行ずつ縦に並べる
+    players.forEach(p => {
+      const v = valueByPlayer[p.id];
+      const isFocus = p.id === focusPlayer.id;
+      const rowClass = isFocus ? 'row-highlight' : '';
+
+      scoreHtml += `<tr class="${rowClass}">`;
+
+      // 参加者名（自分はピルで強調）
+      scoreHtml += `<td class="name-cell">` +
+        (isFocus ? `<span class="pill-current">${p.name}</span>` : p.name) +
+        `</td>`;
+
+      // IN / OUT / 合計 / HD / IN± / OUT± / TOTAL±
+      scoreHtml += `<td>${v.inScore}</td>`;
+      scoreHtml += `<td>${v.outScore}</td>`;
+      scoreHtml += `<td>${v.rawTotal}</td>`;
+      scoreHtml += `<td>${v.handicap}</td>`;
+      scoreHtml += `<td>${v.inAdj}</td>`;
+      scoreHtml += `<td>${v.outAdj}</td>`;
+      scoreHtml += `<td>${v.totalAdj}</td>`;
+
+      scoreHtml += `</tr>`;
+    });
+
+    scoreHtml += `
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    scoreCard.innerHTML = scoreHtml;
+    resultMain.appendChild(scoreCard);
+  }
+
+// ===== スマホ向け：タイトル5連タップで管理ツール表示/非表示 =====
+(function () {
+  const title = document.querySelector('.title-main'); // 「ピンポンパン ～誇りから憧れへ～」
+  const adminBox = document.getElementById('adminTools');
+  if (!title || !adminBox) return;
+
+  let tapCount = 0;
+  let lastTapTime = 0;
+
+  title.addEventListener('click', () => {
+    const now = Date.now();
+
+    // 800ms 以内なら連続タップとみなす。間が空いたらリセット。
+    if (now - lastTapTime <= 800) {
+      tapCount++;
+    } else {
+      tapCount = 1;
+    }
+    lastTapTime = now;
+
+    if (tapCount >= 5) {
+      // 表示/非表示をトグル
+      const isHidden = adminBox.style.display === 'none' || adminBox.style.display === '';
+      adminBox.style.display = isHidden ? 'block' : 'none';
+
+      // 任意：軽くフィードバックを出したければアラートやトースト
+      // alert(isHidden ? '管理者ツールを表示しました。' : '管理者ツールを非表示にしました。');
+
+      tapCount = 0;
+    }
+  });
+})();
+
+  // ==========================
+  // 初期化
+  // ==========================
+  window.addEventListener('load', async () => {
+    await refreshMenuCompSelect();
+    await refreshPlayerDatalist();
+    // 結果発表側は、実際に結果画面を開いたときにだけ読み込む
+    //await refreshResultCompSelect();
+  });
+</script>
+
+</body>
+</html>
