@@ -85,11 +85,11 @@ html {
     }
 
 .title-main .subtitle {
-  font-size: 0.7em;  /* ← ここがポイント！ */
+  font-size: 0.9em;  /* ← ここがポイント！ */
   margin-left: 0.25em;
 }
     .title-sub {
-      font-size: 0.8rem;
+      font-size: 0.6rem;
       color: #666;
     }
 
@@ -612,8 +612,8 @@ html {
       </div>
       <div class="nav-pills">
         <button class="pill active" data-view="topView"><span class="icon">🏠</span>Top</button>
-        <button class="pill" data-view="compView"><span class="icon">📅</span></button>
-        <button class="pill" data-view="scoreView"><span class="icon">✏️</span></button>
+        <button class="pill" data-view="compView"><span class="icon">📅</span>ｺﾝﾍﾟ</button>
+        <button class="pill" data-view="scoreView"><span class="icon">✏️</span>ｽｺｱ</button>
         <button class="pill" data-view="resultView"><span class="icon">🏆</span>結果</button>
       </div>
     </div>
@@ -629,9 +629,10 @@ html {
             <span class="card-title-tag">侠気システム</span>
           </div>
         </div>
+        <br>
         <div class="card-body">
           <div class="field-group">
-            <label for="menuCompSelect">コンペ選択
+            <label for="menuCompSelect">★コンペ選択
             <span class="card-title-tag">今日は何のコンペ？</span>
             </label>
             <select id="menuCompSelect"></select>
@@ -642,7 +643,7 @@ html {
 
           <div class="field-group">
             <label for="menuPlayerInput">名前選択
-            <span class="card-title-tag">一度登録した名前はずっと使います</span>
+            <span class="card-title-tag">以前登録した名前で入力または選択して</span>
             </label>
             <input id="menuPlayerInput" list="playerList" type="text" placeholder="例）山田太郎" />
             <datalist id="playerList"></datalist>
@@ -696,7 +697,7 @@ html {
             <div class="field-group" style="margin-top:8px;">
               <label>コンペ削除（現在選択中）</label>
               <button class="btn btn-ghost btn-small" id="btnDeleteComp">
-                ⚠ このコンペを削除（スコアも全削除）
+                ⚠ このコンペを削除<br>（スコアも全削除）
               </button>
               <div class="hint">
                 ※2回確認のうえ削除します。scores テーブルのデータもすべて削除されます。
