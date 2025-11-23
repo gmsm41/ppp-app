@@ -6,9 +6,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    html {
-      font-size: 22px;
-    }
+html {
+  font-size: 18px;       /* スマホの基本サイズ（少し大きめ） */
+}
+
+/* タブレット以上で少し大きく */
+@media (min-width: 768px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+/* PC では今まで通りくらいの大きさ */
+@media (min-width: 1024px) {
+  html {
+    font-size: 22px;
+  }
+}
     :root {
       --bg1: #1a2a6c;
       --bg2: #fdbb2d;
@@ -560,6 +574,27 @@
   color: var(--danger);
   background: #fff0f5;
 }
+@media (max-width: 480px) {
+  .card {
+    padding: 12px 10px;
+  }
+
+  .ranking-table th,
+  .ranking-table td,
+  .score-table th,
+  .score-table td {
+    font-size: 0.65rem;
+    padding: 3px 2px;
+  }
+
+  .title-main {
+    font-size: 1.1rem;
+  }
+
+  .title-sub {
+    font-size: 0.75rem;
+  }
+}
 
   </style>
 </head>
@@ -1064,9 +1099,12 @@ async function refreshMenuCompSelect() {
       alert('コンペを選択してください。');
       return;
     }
+    // 選択中のコンペを共有
     currentCompId = compId;
-    currentPlayerName = menuPlayerSelect.value;
-    document.getElementById('resultPlayerSelect').value = currentPlayerName;
+    // トップ画面で入力中の名前を「フォーカスする人」として共有
+    currentPlayerName = menuPlayerInput.value.trim();
+    // 結果画面の描画側で currentPlayerName を見てくれるので、
+    // ここではセレクトボックスを直接いじらなくてOK
     showView('resultView');
   });
 
